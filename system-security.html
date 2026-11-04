@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>系统安全 · 学习笔记</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+  <header class="site">
+    <div class="wrap">
+      <div class="brand">系统安全 &amp; 功能安全 <span>· 学习笔记</span></div>
+      <nav class="top">
+        <a href="index.html">首页</a>
+        <a href="system-security.html" class="active">系统安全</a>
+        <a href="functional-safety.html">功能安全</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <article>
+      <h1>系统安全 / 信息安全 System &amp; Cyber Security</h1>
+      <p class="meta">主线：资产 → 威胁 → 攻击面 → 防护 ｜ 标准：ISO/SAE 21434（网络安全工程）、UN R155 / R156（法规）</p>
+
+      <h2>1. 什么是汽车信息安全</h2>
+      <p>随着网联化（蜂窝/V2X）、OTA 升级、车载以太网普及，汽车从"封闭机械"变成"联网终端"，攻击面急剧扩大。汽车信息安全（常称 Cyber Security）保护的是<strong>机密性、完整性、可用性（CIA）</strong>，防范的是<strong>人为蓄意攻击</strong>——这与功能安全（管系统自己出错）正好互补。</p>
+      <div class="note"><b>协同关系：</b>一次成功的网络攻击（如伪造制动指令）会直接引发安全事故。行业共识是"<strong>security is a prerequisite for safety</strong>"——没有安全，功能安全无从谈起。ISO 26262 与 ISO/SAE 21434 在项目层面要联合裁剪、共享危害/威胁分析。</div>
+
+      <h2>2. 标准与法规</h2>
+      <table>
+        <tr><th>文件</th><th>性质</th><th>要点</th></tr>
+        <tr><td>ISO/SAE 21434</td><td>国际标准</td><td>道路车辆网络安全工程流程：从概念→开发→生产→运维全生命周期的网络安全活动</td></tr>
+        <tr><td>UN R155</td><td>联合国法规</td><td>CSMS（网络安全管理体系）强制要求，车型准入前提</td></tr>
+        <tr><td>UN R156</td><td>联合国法规</td><td>SUMS（软件更新管理体系）+ OTA 合规</td></tr>
+      </table>
+
+      <h2>3. TARA：威胁分析与风险评估</h2>
+      <p>TARA 是 21434 的核心活动，对应功能安全里的 HARA，串法如下：</p>
+      <ol>
+        <li><strong> 资产识别</strong>：列出需要保护的东西（密钥、CAN 报文、固件、用户隐私数据）。</li>
+        <li><strong> 威胁建模</strong>：用 <strong>STRIDE</strong> 系统枚举威胁——Spoofing（伪造）、Tampering（篡改）、Repudiation（抵赖）、Information Disclosure（泄露）、Denial of Service（拒绝服务）、Elevation of Privilege（提权）。</li>
+        <li><strong> 攻击路径 / 攻击树</strong>：从攻击者能力出发，画"如何达成危害"的路径。</li>
+        <li><strong> 影响评级 &amp; 攻击可行性</strong>：评估安全/隐私影响与攻击难度。</li>
+        <li><strong> 风险处置</strong>：规避 / 缓解 / 转移 / 接受，导出<strong>网络安全目标</strong>与需求。</li>
+      </ol>
+      <div class="warn"><b>与 HARA 对照记忆：</b>TARA 用 STRIDE+影响评级定风险，HARA 用 S/E/C 定 ASIL。一个是"防人"，一个是"防失效"，但都是"先分析、再定级、再出安全/安全需求"的同一种工程思维。</div>
+
+      <h2>4. 常见攻击面</h2>
+      <ul>
+        <li><strong> 车载网络</strong>：传统 CAN/CAN FD <strong>无身份认证、无加密</strong>，可伪造报文（如伪造制动/转向指令）——典型风险。</li>
+        <li><strong> 车载以太网</strong>：面向服务架构（SOA）带来更多远程可达接口。</li>
+        <li><strong> OTA / 固件</strong>：刷写通道若未签名校验，可被植入恶意固件。</li>
+        <li><strong> 无线入口</strong>：蓝牙、Wi-Fi、蜂窝、钥匙（RFID 中继攻击）。</li>
+        <li><strong> 传感器</strong>：激光雷达/摄像头可被<strong>物理对抗样本</strong>欺骗（见第 6 节）。</li>
+        <li><strong> ECU 固件</strong>：逆向提取密钥、调试接口未锁。</li>
+      </ul>
+
+      <h2>5. 防护手段</h2>
+      <table>
+        <tr><th>手段</th><th>作用</th></tr>
+        <tr><td>SecOC（Secure Onboard Communication）</td><td>给 CAN 报文加 MAC + 新鲜值，防伪造/重放</td></tr>
+        <tr><td>HSM / Evita 架构</td><td>硬件安全模块，密钥不出芯片，做加解密与签名</td></tr>
+        <tr><td>安全启动（Secure Boot）</td><td>逐级验签，拒绝未授权固件</td></tr>
+        <tr><td>固件签名 / OTA 验签</td><td>保证刷入的是厂商可信镜像</td></tr>
+        <tr><td>IDS（入侵检测系统）</td><td>监测总线/网络异常行为</td></tr>
+        <tr><td>密钥管理 / PKI</td><td>证书生命周期、吊销、隔离</td></tr>
+      </table>
+
+      <h2>6. 深度学习与汽车信息安全（重点交叉区）</h2>
+      <p>这一节把你的算法/感知背景接到安全攻击与防御两端——既是威胁来源，也是防御工具。</p>
+
+      <h3>6.1 威胁：对抗样本攻击感知系统</h3>
+      <p>深度学习模型对输入扰动敏感，攻击者可在<strong>物理世界</strong>制造对抗效果：</p>
+      <ul>
+        <li><strong> FGSM（快速梯度符号）</strong>：沿损失梯度符号方向加一步小扰动，成本低、易实现。</li>
+        <li><strong> PGD（投影梯度下降）</strong>：FGSM 的多步迭代版，更强（"一阶最强"攻击），常作鲁棒性基准。</li>
+        <li><strong> 物理对抗补丁 / 贴纸</strong>：贴在路牌或车上，使目标检测漏检（如"停止标志"被识别为其他），直接转化为安全事故。</li>
+      </ul>
+      <div class="note"><b>与功能安全呼应：</b>同一个对抗补丁，在<strong>信息安全</strong>视角是"蓄意攻击"，在<strong>功能安全/SOTIF</strong>视角是"性能不足导致危害"。两页对照，能讲清 safety 与 security 的协同。</div>
+
+      <h3>6.2 模型自身的安全与隐私</h3>
+      <table>
+        <tr><th>风险</th><th>说明</th><th>缓解</th></tr>
+        <tr><td>模型窃取</td><td>通过 API 大量查询重建模型</td><td>查询限速、水印、输出扰动</td></tr>
+        <tr><td>训练数据投毒</td><td>污染训练集植入后门</td><td>数据清洗、来源审计、异常检测</td></tr>
+        <tr><td>成员推断</td><td>判断某样本是否在训练集（隐私泄露）</td><td>差分隐私、模型蒸馏</td></tr>
+      </table>
+
+      <h3>6.3 用 DL 做安全工具</h3>
+      <p>反过来，深度学习也是强大的安全手段：</p>
+      <ul>
+        <li><strong> CAN 总线入侵检测</strong>：用序列模型学习正常报文时序，检测伪造/异常帧。</li>
+        <li><strong> 日志 / 流量异常检测</strong>：无监督异常检测发现未知攻击模式。</li>
+        <li><strong> 固件/恶意流量分类</strong>：端到端分类识别威胁。</li>
+      </ul>
+
+      <h2>7. 学习路线速查</h2>
+      <ol>
+        <li>先建立 CIA + 攻击面概念，读 UN R155 概要。</li>
+        <li>掌握 TARA 流程与 STRIDE，能对着一个 ECU 画威胁树。</li>
+        <li>理解 SecOC / HSM / 安全启动的"为什么"，不必死记命令。</li>
+        <li>把对抗样本（FGSM/PGD）作为 DL 与安全的结合点，亲手跑一遍小实验。</li>
+        <li>最后回到"security → safety"协同，和<strong>功能安全页</strong>打通。</li>
+      </ol>
+      <div class="note"><b>关联阅读：</b>功能安全页的"感知安全 / SOTIF"一节从<strong>失效</strong>视角讲同一批 DL 风险，建议两页对照复习。</div>
+    </article>
+  </main>
+
+  <footer class="site">
+    <div class="wrap">个人学习用途 · 内容参考 ISO/SAE 21434、UN R155/R156 及个人项目经验整理</div>
+  </footer>
+</body>
+</html>

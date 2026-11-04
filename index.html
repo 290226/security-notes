@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>系统安全 & 功能安全 · 学习笔记</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+  <header class="site">
+    <div class="wrap">
+      <div class="brand">系统安全 &amp; 功能安全 <span>· 学习笔记</span></div>
+      <nav class="top">
+        <a href="index.html" class="active">首页</a>
+        <a href="system-security.html">系统安全</a>
+        <a href="functional-safety.html">功能安全</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="lead">
+      <h1>系统安全与功能安全 · 个人学习提纲</h1>
+      <p>面向求职（自动驾驶 / 嵌入式系统的安全方向）的自学笔记，按主题分页面沉淀，并穿插深度学习相关内容。先开两页，后续持续补充。</p>
+    </section>
+
+    <div class="cards">
+      <a class="card" href="functional-safety.html">
+        <h3>功能安全 Functional Safety</h3>
+        <p>ISO 26262 体系：HARA、ASIL、V 模型开发流程、FMEA/FTA 安全分析、SOTIF（ISO 21448），以及深度学习在安全关键系统里的角色。</p>
+        <span class="tag">已开 · 6 节</span>
+      </a>
+      <a class="card" href="system-security.html">
+        <h3>系统安全 / 信息安全 System &amp; Cyber Security</h3>
+        <p>汽车网络安全 ISO/SAE 21434、UN R155/R156、TARA 威胁建模、车载攻击面、SecOC/HSM/安全启动，以及对抗样本、模型安全等深度学习交叉点。</p>
+        <span class="tag">已开 · 6 节</span>
+      </a>
+    </div>
+
+    <article style="margin-top:34px">
+      <h2>怎么用这份笔记</h2>
+      <p>每页都是一个独立主题，左侧导航可在两页之间跳转。建议学习顺序：</p>
+      <ul>
+        <li><strong>先读功能安全</strong>：建立「失效 → 危害 → 风险 → 安全机制」的主线，这是安全工程的共同语言。</li>
+        <li><strong>再读系统安全</strong>：理解「攻击 → 威胁 → 防护」，它与功能安全共享 V 模型与风险管理思路，但关注点是"人故意搞破坏"。</li>
+        <li><strong>交叉看深度学习</strong>：两页都单列了 DL 相关内容——感知安全、对抗样本、模型鲁棒性验证，这是你（感知/算法背景）区别于纯汽车专业候选人的差异化弹药。</li>
+      </ul>
+      <div class="note">
+        <b>定位说明：</b>这是<strong>学习笔记</strong>，不是简历也不是结题报告。内容会随学习持续修订，欢迎在本仓库里直接改、提 PR。
+      </div>
+    </article>
+  </main>
+
+  <footer class="site">
+    <div class="wrap">个人学习用途 · 内容参考 ISO 26262 / ISO 21448 / ISO 21434 等公开标准与个人项目经验整理</div>
+  </footer>
+</body>
+</html>

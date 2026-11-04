@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>功能安全 · 学习笔记</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+  <header class="site">
+    <div class="wrap">
+      <div class="brand">系统安全 &amp; 功能安全 <span>· 学习笔记</span></div>
+      <nav class="top">
+        <a href="index.html">首页</a>
+        <a href="system-security.html">系统安全</a>
+        <a href="functional-safety.html" class="active">功能安全</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <article>
+      <h1>功能安全 Functional Safety</h1>
+      <p class="meta">主线：失效 → 危害 → 风险 → 安全机制 ｜ 标准：ISO 26262（道路车辆功能安全）；延伸：ISO 21448 SOTIF</p>
+
+      <h2>1. 什么是功能安全</h2>
+      <p>功能安全关注<strong>电子电气系统（E/E）自身失效</strong>带来的不合理风险——即"系统没坏在黑客手里，而是自己 design/制造/运行出错，导致伤人"。注意它和"信息安全"是两套标准：</p>
+      <table>
+        <tr><th>维度</th><th>功能安全 (ISO 26262)</th><th>信息安全 (ISO/SAE 21434)</th></tr>
+        <tr><td>关注风险来源</td><td>随机硬件失效 + 系统性失效</td><td>人为蓄意攻击（黑客、篡改、窃取）</td></tr>
+        <tr><td>目标</td><td>把残留风险降到可接受水平</td><td>保护资产机密性/完整性/可用性</td></tr>
+        <tr><td>典型手法</td><td>HARA、ASIL、安全机制、FTA/FMEA</td><td>TARA、SecOC、HSM、加密</td></tr>
+      </table>
+      <div class="note"><b>一句话记忆：</b>功能安全管"机器自己出错"，信息安全管"别人故意搞你"。两者在车上要协同（security breach 也会引发 safety 事故）。</div>
+
+      <h2>2. 核心概念：HARA → ASIL → 安全目标</h2>
+      <p>概念阶段（Concept Phase）的串法：</p>
+      <ol>
+        <li><strong> item 定义</strong>：先框定要分析的功能/系统边界（例如"自动紧急制动 AEB"）。</li>
+        <li><strong> HARA（危害分析与风险评估）</strong>：枚举危害事件 → 对每个评估 <strong>S（严重度）</strong>、<strong>E（暴露概率）</strong>、<strong>C（可控性）</strong>三个等级。</li>
+        <li><strong> ASIL 定级</strong>：由 S/E/C 组合得出 ASIL A~D（D 最严），QM 表示"质量管控即可、无需功能安全措施"。</li>
+        <li><strong> 安全目标（Safety Goal）</strong> + <strong>ASIL</strong>：针对每条危害给出定性的安全目标（如"避免非预期制动"）。</li>
+        <li><strong> 功能安全需求（FSR）→ 技术安全需求（TSR）→ 软硬件安全需求</strong>：逐级分解、可验证。</li>
+      </ol>
+      <div class="warn"><b>面试常考：</b>ASIL 不是给"零件"定的，是给"某条危害对应的安全目标"定的。同一个 ECU 里不同功能可能带不同 ASIL（混合关键度），要靠隔离机制处理。</div>
+
+      <h2>3. 开发流程：V 模型</h2>
+      <p>ISO 26262 沿 V 模型展开，左边分解需求、右边逐级验证：</p>
+      <table>
+        <tr><th>左侧（分解）</th><th>右侧（验证）</th></tr>
+        <tr><td>概念 → 系统级 FSR</td><td>系统集成测试（确认安全目标达成）</td></tr>
+        <tr><td>系统 → 硬件/软件 TSR</td><td>硬件集成测试 / 软件单元测试</td></tr>
+        <tr><td>软件 → 软件安全需求</td><td>软件/硬件架构度量评估</td></tr>
+      </table>
+      <p>硬件要算<strong>随机硬件失效度量</strong>：SPFM（单点故障度量）、LFM（潜在故障度量）、PMHF（随机硬件失效概率度量，单位 FIT）。软件强调<strong>防御式编程</strong>与<strong>故障容错</strong>。</p>
+
+      <h2>4. 安全分析手法：FMEA / FTA</h2>
+      <ul>
+        <li><strong> FMEA（失效模式与影响分析）</strong>：自下而上，列每个部件"怎么失效、影响啥、严不严重（S/O/D 评分）"，偏设计早期筛查。</li>
+        <li><strong> FTA（故障树分析）</strong>：自上而下，从顶层危害事件出发，用"与/或门"追根到基本事件，算顶事件概率，偏定量。</li>
+        <li><strong> FMECA</strong> = FMEA + 危害性排序（Criticality）。</li>
+      </ul>
+
+      <h2>5. 软件安全机制：fail-safe 思维</h2>
+      <p>功能安全对代码的硬要求是<strong>可预测地进入安全状态</strong>。两个可背的代码范式：</p>
+      <p><strong>极简状态机（未知事件一律进安全态）：</strong></p>
+<pre><code>enum class State { OFF, STANDBY, ACTIVE, FAULT };
+enum class Event { POWER_ON, ACTIVATE, FAULT_OCCUR, RESET };
+
+State transition(State s, Event e) {
+    switch (s) {
+        case State::OFF:     return e == Event::POWER_ON    ? State::STANDBY : State::OFF;
+        case State::STANDBY: return e == Event::ACTIVATE    ? State::ACTIVE  : State::STANDBY;
+        case State::ACTIVE:  return e == Event::FAULT_OCCUR ? State::FAULT   : State::ACTIVE;
+        case State::FAULT:   return e == Event::RESET       ? State::OFF     : State::FAULT;
+    }
+    return State::FAULT;   // 兜底：任何未知组合都进安全状态
+}</code></pre>
+      <p><strong>CRC-8（车规 E2E 信号保护，AUTOSAR E2E Profile 用 CRC+计数器+Data ID 防丢帧/乱序/重复）：</strong></p>
+<pre><code>def crc8(data: bytes, poly: int = 0x07, init: int = 0x00) -&gt; int:
+    """CRC-8 逐位计算；poly=0x07 是常用 CRC-8/SMBUS 多项式"""
+    crc = init
+    for byte in data:
+        crc ^= byte
+        for _ in range(8):
+            if crc &amp; 0x80:
+                crc = ((crc &lt;&lt; 1) ^ poly) &amp; 0xFF
+            else:
+                crc = (crc &lt;&lt; 1) &amp; 0xFF
+    return crc
+
+assert crc8(b"123456789") == 0xF4   # CRC-8/SMBUS 标准校验值</code></pre>
+
+      <h2>6. 深度学习与安全关键系统（重点交叉区）</h2>
+      <p>这一节是你区别于纯汽车背景候选人的差异化弹药——把"算法/感知"经验接到功能安全语言上。</p>
+
+      <h3>6.1 感知安全：SOTIF 的主战场</h3>
+      <p>当安全相关功能依赖深度学习模型（检测、分割、深度估计）时，模型输出错误可能直接造成危害，这类风险<strong>不属于 ISO 26262 的"随机/系统性失效"，而属于 ISO 21448 SOTIF（预期功能安全）</strong>：关注"功能在<strong>性能不足</strong>或<strong>可预见误用</strong>下的风险"。</p>
+      <div class="note"><b>用你的项目串：</b>禾赛激光雷达<strong>脏污检测</strong>——脏污会让点云出现残差异常 → 误检/漏检风险。你用的"<strong>按仰角带动态阈值 + 干净帧基线扣除</strong>"本质是<strong>降误报</strong>思路，与 SOTIF"性能不足与可预见误用"同源；脏污检测本身就是感知<strong>安全相关功能</strong>。面试时直接把算法题聊成项目题，是最值钱的答法。</div>
+
+      <h3>6.2 DL 模型的风险点与验证</h3>
+      <table>
+        <tr><th>风险</th><th>表现</th><th>验证/缓解手段</th></tr>
+        <tr><td>对抗样本</td><td>微小扰动使模型误判</td><td>对抗训练、红蓝对抗（FGSM/PGD 测试）、输入异常检测</td></tr>
+        <tr><td>分布偏移 / OOD</td><td>真实场景与训练集不同</td><td>OOD 检测、不确定性估计、长尾/corner case 覆盖</td></tr>
+        <tr><td>可解释性差</td><td>出错难归因</td><td>失败模式分析、影子模式（shadow mode）灰度</td></tr>
+        <tr><td>数据偏差</td><td>特定群体/场景性能差</td><td>场景仿真回放、覆盖度指标</td></tr>
+      </table>
+
+      <h3>6.3 AI Safety 与负责任部署</h3>
+      <p>把模型放进安全相关链路前，至少要回答：<strong>最坏情况是什么、是否有 fail-safe 兜底、能否在仿真里大量回放验证、误报/漏报的代价是否可接受</strong>。这与功能安全"需求先行、边界优先"的思维方式完全一致。</p>
+
+      <div class="note"><b>关联阅读：</b>系统安全页的"对抗样本"一节从<strong>攻击/信息安全</strong>视角讲同一件事——同一个对抗补丁，在功能安全里是"性能不足导致危害"，在信息安全里是"蓄意攻击导致危害"。两页对照看，能讲清 safety 与 security 的协同。</div>
+    </article>
+  </main>
+
+  <footer class="site">
+    <div class="wrap">个人学习用途 · 内容参考 ISO 26262 / ISO 21448 及个人项目经验整理</div>
+  </footer>
+</body>
+</html>

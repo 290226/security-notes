@@ -44,6 +44,9 @@
       </ol>
       <div class="warn"><b>易错点：</b>ASIL 不是给"零件"定的，是给"某条危害对应的安全目标"定的。同一个 ECU 里不同功能可能带不同 ASIL（混合关键度），要靠隔离机制处理。</div>
 
+      <h3>2.1 ASIL 分解（ASIL Decomposition）</h3>
+      <p>当某条安全目标定到 ASIL D（最严）时，可用<strong>冗余</strong>把要求"降档"：把一项高 ASIL 功能拆成两条相互独立、共同达成同一安全目标的低 ASIL 路径（如 ASIL D = ASIL B + ASIL B），前提是两条路径满足<strong>独立性 / 免干扰（Freedom from Interference）</strong>。本质是"用硬件或架构冗余换开发成本"——必须证明两条路径不会因同一根因同时失效，否则分解无效。</p>
+
       <h2>3. 开发流程：V 模型</h2>
       <p>ISO 26262 沿 V 模型展开，左边分解需求、右边逐级验证：</p>
       <table>
@@ -109,6 +112,15 @@ assert crc8(b"123456789") == 0xF4   # CRC-8/SMBUS 标准校验值</code></pre>
 
       <h3>6.3 AI Safety 与负责任部署</h3>
       <p>把模型放进安全相关链路前，至少要回答：<strong>最坏情况是什么、是否有 fail-safe 兜底、能否在仿真里大量回放验证、误报/漏报的代价是否可接受</strong>。这与功能安全"需求先行、边界优先"的思维方式完全一致。</p>
+
+      <h3>6.4 SOTIF 场景分类：已知/未知 × 安全/不安全</h3>
+      <p>SOTIF 将功能运行场景按"是否已知"与"是否安全"分为四类，用于指导验证资源的投放：</p>
+      <table>
+        <tr><th></th><th>已知 Known</th><th>未知 Unknown</th></tr>
+        <tr><td><strong>安全 Safe</strong></td><td>Area 1：已知安全场景，常规运行</td><td>Area 3：未知但安全，靠 ODD 边界与运行监控兜底</td></tr>
+        <tr><td><strong>不安全 Unsafe</strong></td><td>Area 2：已知不安全（已知 corner case、已知误用），重点做针对性缓解与验证</td><td>Area 4：未知不安全（未知失效模式），最难，靠充分测试、仿真回放、运行监控与 OTA 持续迭代</td></tr>
+      </table>
+      <div class="note"><b>与前文实例呼应：</b>激光雷达脏污导致的误检/漏检可归入"已知不安全（Area 2）"——其触发条件（脏污）与失效模式已知，因此可通过"仰角带动态阈值 + 干净帧基线扣除"等监测与缓解手段系统性地覆盖，而非依赖偶然发现。</div>
 
       <div class="note"><b>关联阅读：</b>系统安全页的"对抗样本"一节从<strong>攻击/信息安全</strong>视角讲同一件事——同一个对抗补丁，在功能安全里是"性能不足导致危害"，在信息安全里是"蓄意攻击导致危害"。两页对照看，能讲清 safety 与 security 的协同。</div>
     </article>

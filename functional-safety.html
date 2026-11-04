@@ -31,7 +31,7 @@
         <tr><td>目标</td><td>把残留风险降到可接受水平</td><td>保护资产机密性/完整性/可用性</td></tr>
         <tr><td>典型手法</td><td>HARA、ASIL、安全机制、FTA/FMEA</td><td>TARA、SecOC、HSM、加密</td></tr>
       </table>
-      <div class="note"><b>一句话记忆：</b>功能安全管"机器自己出错"，信息安全管"别人故意搞你"。两者在车上要协同（security breach 也会引发 safety 事故）。</div>
+      <div class="note"><b>一句话记忆：</b>功能安全管"系统自身失效"，信息安全管"他人蓄意攻击"。两者在车上要协同（security breach 也会引发 safety 事故）。</div>
 
       <h2>2. 核心概念：HARA → ASIL → 安全目标</h2>
       <p>概念阶段（Concept Phase）的串法：</p>
@@ -42,7 +42,7 @@
         <li><strong> 安全目标（Safety Goal）</strong> + <strong>ASIL</strong>：针对每条危害给出定性的安全目标（如"避免非预期制动"）。</li>
         <li><strong> 功能安全需求（FSR）→ 技术安全需求（TSR）→ 软硬件安全需求</strong>：逐级分解、可验证。</li>
       </ol>
-      <div class="warn"><b>面试常考：</b>ASIL 不是给"零件"定的，是给"某条危害对应的安全目标"定的。同一个 ECU 里不同功能可能带不同 ASIL（混合关键度），要靠隔离机制处理。</div>
+      <div class="warn"><b>易错点：</b>ASIL 不是给"零件"定的，是给"某条危害对应的安全目标"定的。同一个 ECU 里不同功能可能带不同 ASIL（混合关键度），要靠隔离机制处理。</div>
 
       <h2>3. 开发流程：V 模型</h2>
       <p>ISO 26262 沿 V 模型展开，左边分解需求、右边逐级验证：</p>
@@ -92,11 +92,11 @@ State transition(State s, Event e) {
 assert crc8(b"123456789") == 0xF4   # CRC-8/SMBUS 标准校验值</code></pre>
 
       <h2>6. 深度学习与安全关键系统（重点交叉区）</h2>
-      <p>这一节是你区别于纯汽车背景候选人的差异化弹药——把"算法/感知"经验接到功能安全语言上。</p>
+      <p>本节将"算法/感知"经验与功能安全语言对接：当安全相关功能依赖深度学习模型时，感知算法的可靠性本身就是功能安全（尤其是 ISO 21448 SOTIF）的关注对象。</p>
 
       <h3>6.1 感知安全：SOTIF 的主战场</h3>
       <p>当安全相关功能依赖深度学习模型（检测、分割、深度估计）时，模型输出错误可能直接造成危害，这类风险<strong>不属于 ISO 26262 的"随机/系统性失效"，而属于 ISO 21448 SOTIF（预期功能安全）</strong>：关注"功能在<strong>性能不足</strong>或<strong>可预见误用</strong>下的风险"。</p>
-      <div class="note"><b>用你的项目串：</b>禾赛激光雷达<strong>脏污检测</strong>——脏污会让点云出现残差异常 → 误检/漏检风险。你用的"<strong>按仰角带动态阈值 + 干净帧基线扣除</strong>"本质是<strong>降误报</strong>思路，与 SOTIF"性能不足与可预见误用"同源；脏污检测本身就是感知<strong>安全相关功能</strong>。面试时直接把算法题聊成项目题，是最值钱的答法。</div>
+      <div class="note"><b>实例：激光雷达脏污检测与 SOTIF 的关联。</b>以激光雷达<strong>脏污检测</strong>为例：传感器表面脏污会使点云出现残差异常，进而引入误检/漏检风险。采用"<strong>按仰角带动态阈值 + 干净帧基线扣除</strong>"的降误报思路，其目标与 SOTIF 关注的"功能在<strong>性能不足</strong>或<strong>可预见误用</strong>下的风险"一致——脏污检测本身即是一项感知<strong>安全相关功能</strong>。将感知/算法项目用功能安全语言重新表述，有助于厘清深度学习经验与安全标准的对应关系。</div>
 
       <h3>6.2 DL 模型的风险点与验证</h3>
       <table>

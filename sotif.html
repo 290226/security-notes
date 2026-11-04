@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>预期功能安全 SOTIF · 学习笔记</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+  <header class="site">
+    <div class="wrap">
+      <div class="brand">系统安全 &amp; 功能安全 <span>· 学习笔记</span></div>
+      <nav class="top">
+        <a href="index.html">首页</a>
+        <a href="system-security.html">系统安全</a>
+        <a href="functional-safety.html">功能安全</a>
+        <a href="sotif.html" class="active">预期功能安全</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <article>
+      <h1>预期功能安全 SOTIF（ISO 21448）</h1>
+      <p class="meta">主线：功能不足 / 可预见误用 → 危害 → 验证与确认 → 运行监控与迭代 ｜ 标准：ISO 21448（2022 发布）</p>
+
+      <h2>1. 什么是 SOTIF</h2>
+      <p>预期功能安全（Safety Of The Intended Functionality, SOTIF）关注：<strong>系统在无故障（即正确实现设计意图）的情况下，仍可能因功能不足或可被合理预见的误用而引发危害</strong>。它补上传统功能安全（ISO 26262）覆盖不到的一块——26262 管"系统出错"，SOTIF 管"系统没错但功能本身不够好 / 被人用错"。</p>
+      <table>
+        <tr><th>维度</th><th>ISO 26262 功能安全</th><th>ISO 21448 SOTIF</th></tr>
+        <tr><td>风险来源</td><td>随机硬件失效 + 系统性失效（设计/制造缺陷）</td><td>功能不足（性能局限）+ 可预见误用</td></tr>
+        <tr><td>典型对象</td><td>确定性控制逻辑、执行器、通信</td><td>感知/决策类 AI 功能、复杂场景应对</td></tr>
+        <tr><td>核心活动</td><td>HARA、ASIL、安全机制、FTA/FMEA</td><td>触发条件分析、场景分类、验证与确认、运行监控</td></tr>
+        <tr><td>两者关系</td><td colspan="2">互补：SOTIF 发现的"功能不足"可能反过来要求 26262 的安全机制兜底</td></tr>
+      </table>
+
+      <h2>2. 为什么需要 SOTIF</h2>
+      <ul>
+        <li><strong>自动驾驶等级提升</strong>：L2+ 把更多驾驶权交给系统，感知/规划错误直接关联安全。</li>
+        <li><strong>深度学习不可解释</strong>：端到端模型难以穷举"什么输入会出错"，传统基于故障的验证方法失效。</li>
+        <li><strong>开放场景无限</strong>：真实道路的 corner case 无法全部预知（天气、遮挡、异形目标）。</li>
+        <li><strong>ODD 边界模糊</strong>：系统在设计运行域（ODD）边缘的行为难以保证。</li>
+      </ul>
+      <div class="note"><b>一句话定位：</b>当功能安全（26262）把"已知失效"压到可接受水平后，剩余风险主要来自"功能在正确运行下仍不够好"——这正是 SOTIF 的主场。</div>
+
+      <h2>3. 场景分类：已知/未知 × 安全/不安全</h2>
+      <p>SOTIF 用二维划分描述功能运行的所有场景，指导验证资源向高风险区倾斜：</p>
+      <table>
+        <tr><th></th><th>已知 Known</th><th>未知 Unknown</th></tr>
+        <tr><td><strong>安全 Safe</strong></td><td><strong>Area 1</strong>：已知且安全的常规运行场景</td><td><strong>Area 3</strong>：未知但（预期）安全的场景，靠 ODD 定义与运行监控兜底</td></tr>
+        <tr><td><strong>不安全 Unsafe</strong></td><td><strong>Area 2</strong>：已知不安全的场景（已知 corner case、已知误用）——可针对性缓解、验证</td><td><strong>Area 4</strong>：未知不安全的场景（未知失效模式）——最难，靠充分测试、仿真回放、运行监控与 OTA 持续迭代</td></tr>
+      </table>
+      <div class="warn"><b>目标：</b>SOTIF 工作的最终目的是把 Area 2、Area 4 的残余风险降到可接受水平——通过"识别—缓解—验证"已知风险，以及"监测—学习—迭代"未知风险。</div>
+
+      <h2>4. SOTIF 核心活动（开发流程）</h2>
+      <ol>
+        <li><strong>功能定义与触发条件分析</strong>：明确功能意图、ODD 边界，以及可能诱发危害的<strong>触发条件</strong>（如恶劣天气、传感器脏污、罕见目标）。</li>
+        <li><strong>危害识别</strong>：列出由<strong>功能不足</strong>（感知/算法局限）和<strong>可预见误用</strong>（驾驶员不当依赖、越界使用）导致的危害事件。</li>
+        <li><strong>已知危害的验证与确认（针对 Area 2）</strong>：用场景库、仿真、实车测试证明已知不安全场景已被覆盖或缓解。</li>
+        <li><strong>未知危害的评估与运行监控（针对 Area 3/4）</strong>：通过影子模式（shadow mode）、车队数据闭环、运行时监控，持续发现并迭代未知风险。</li>
+        <li><strong>残余风险评审</strong>：确认 SOTIF 相关风险降到可接受，并给出运行阶段的监控与更新计划。</li>
+      </ol>
+
+      <h2>5. 两类风险来源</h2>
+      <h3>5.1 功能不足（Performance Limitation）</h3>
+      <ul>
+        <li><strong>感知局限</strong>：传感器盲区、低反射率目标、恶劣天气、遮挡。</li>
+        <li><strong>算法误判</strong>：模型在分布偏移 / OOD 输入下输出错误。</li>
+        <li><strong>规划失误</strong>：对罕见交通参与者的行为预测偏差。</li>
+      </ul>
+      <h3>5.2 可预见误用（Foreseeable Misuse）</h3>
+      <ul>
+        <li>驾驶员过度依赖辅助驾驶、在 ODD 外使用。</li>
+        <li>对系统能力边界的误解（如把 L2 当 L4）。</li>
+      </ul>
+
+      <h2>6. 验证与确认手段</h2>
+      <table>
+        <tr><th>手段</th><th>针对</th><th>说明</th></tr>
+        <tr><td>触发条件分析</td><td>Area 2/4</td><td>系统化枚举"什么情况下功能会出问题"</td></tr>
+        <tr><td>场景库 / 仿真</td><td>Area 2</td><td>构造已知危险场景，批量回归验证</td></tr>
+        <tr><td>影子模式 Shadow Mode</td><td>Area 3/4</td><td>模型在后台并行运行，对比实车决策，发现未知失误</td></tr>
+        <tr><td>ODD 定义与验证</td><td>Area 1/3</td><td>明确并验证设计运行域边界</td></tr>
+        <tr><td>数据闭环 / OTA</td><td>Area 4</td><td>用真实运行数据持续训练、修复未知失效</td></tr>
+      </table>
+
+      <h2>7. 实例：激光雷达脏污检测（感知安全功能）</h2>
+      <p>以激光雷达<strong>脏污检测</strong>为例说明 SOTIF 思路的落地：</p>
+      <ul>
+        <li><strong>触发条件</strong>：传感器表面脏污（泥、雪、水渍）。</li>
+        <li><strong>功能不足表现</strong>：脏污使点云出现残差异常，引发目标<strong>误检 / 漏检</strong>。</li>
+        <li><strong>缓解手段</strong>：采用"按仰角带动态阈值 + 干净帧基线扣除"的降误报思路，对异常点云区域做监测与抑制。</li>
+        <li><strong>SOTIF 归类</strong>：该风险属于<strong>已知不安全（Area 2）</strong>——触发条件与失效模式已知，因此可通过上述监测/缓解手段<strong>系统性覆盖</strong>，而非依赖偶然发现。</li>
+      </ul>
+      <div class="note"><b>与方法论呼应：</b>"仰角带动态阈值 + 干净帧基线扣除"本质是<strong>降误报</strong>策略，与 SOTIF 在"功能不足导致危害"上的关注点一致；将感知/算法项目用 SOTIF 语言重新表述，有助于厘清工程经验与安全标准的对应关系。</div>
+
+      <h2>8. 与功能安全、系统安全的协同</h2>
+      <ul>
+        <li><strong>SOTIF ↔ 功能安全（ISO 26262）</strong>：SOTIF 发现的"功能不足"若需硬件/软件安全机制兜底（如 fail-safe 降级），即进入 26262 范围。</li>
+        <li><strong>SOTIF ↔ 系统安全（ISO/SAE 21434）</strong>：同一对抗补丁，在系统安全里是"蓄意攻击"，在 SOTIF 里是"性能不足导致危害"；两者需在项目层面联合分析。</li>
+      </ul>
+      <div class="note"><b>关联阅读：</b>功能安全页的"感知安全 / SOTIF 主战场"与"场景分类"小节给出交叉视角；系统安全页的"对抗样本"一节从攻击侧讲同一批 DL 风险。三页对照，能建立 safety 与 security 的完整框架。</div>
+    </article>
+  </main>
+
+  <footer class="site">
+    <div class="wrap">个人学习用途 · 内容参考 ISO 21448 及个人项目经验整理</div>
+  </footer>
+</body>
+</html>

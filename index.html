@@ -14,6 +14,7 @@
         <a href="index.html" class="active">首页</a>
         <a href="system-security.html">系统安全</a>
         <a href="functional-safety.html">功能安全</a>
+        <a href="sotif.html">预期功能安全</a>
       </nav>
     </div>
   </header>
@@ -21,25 +22,30 @@
   <main class="wrap">
     <section class="lead">
       <h1>系统安全与功能安全 · 个人学习提纲</h1>
-      <p>面向求职（自动驾驶 / 嵌入式系统的安全方向）的自学笔记，按主题分页面沉淀，并穿插深度学习相关内容。先开两页，后续持续补充。</p>
+      <p>面向求职（自动驾驶 / 嵌入式系统的安全方向）的自学笔记，按主题分页面沉淀，并穿插深度学习相关内容。目前已开三页，后续持续补充。</p>
     </section>
 
     <div class="cards">
       <a class="card" href="functional-safety.html">
         <h3>功能安全 Functional Safety</h3>
         <p>ISO 26262 体系：HARA、ASIL、V 模型开发流程、FMEA/FTA 安全分析、SOTIF（ISO 21448），以及深度学习在安全关键系统里的角色。</p>
-        <span class="tag">已开 · 6 节</span>
+        <span class="tag">已开 · 8 节</span>
       </a>
       <a class="card" href="system-security.html">
         <h3>系统安全 / 信息安全 System &amp; Cyber Security</h3>
         <p>汽车网络安全 ISO/SAE 21434、UN R155/R156、TARA 威胁建模、车载攻击面、SecOC/HSM/安全启动，以及对抗样本、模型安全等深度学习交叉点。</p>
-        <span class="tag">已开 · 6 节</span>
+        <span class="tag">已开 · 7 节</span>
+      </a>
+      <a class="card" href="sotif.html">
+        <h3>预期功能安全 SOTIF（ISO 21448）</h3>
+        <p>功能在"没错却仍不安全"下的风险：功能不足与可预见误用、Area 1~4 场景分类、触发条件分析、验证与确认、运行监控与数据闭环，并以激光雷达脏污检测为实例。</p>
+        <span class="tag">已开 · 8 节</span>
       </a>
     </div>
 
     <article style="margin-top:34px">
       <h2>怎么用这份笔记</h2>
-      <p>每页都是一个独立主题，左侧导航可在两页之间跳转。建议学习顺序：</p>
+      <p>每页都是一个独立主题，左侧导航可在各页之间跳转。建议学习顺序：</p>
       <ul>
         <li><strong>先读功能安全</strong>：建立「失效 → 危害 → 风险 → 安全机制」的主线，这是安全工程的共同语言。</li>
         <li><strong>再读系统安全</strong>：理解「攻击 → 威胁 → 防护」，它与功能安全共享 V 模型与风险管理思路，但关注点是"人故意搞破坏"。</li>
